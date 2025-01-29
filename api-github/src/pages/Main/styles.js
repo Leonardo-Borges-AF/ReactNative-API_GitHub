@@ -1,3 +1,4 @@
+import {Link} from 'react-router-dom'
 import styled from "styled-components";
 
 export const Container = styled.div`
@@ -39,7 +40,7 @@ export const Input = styled.input`
   }
 `;
 
-export const Button = styled.button`
+export const Button = styled(Link)`
   display: flex;
   align-items: center;
   justify-content: center;
