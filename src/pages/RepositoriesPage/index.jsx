@@ -1,57 +1,37 @@
-import React, { useState } from "react";
-
-import { Container, SideBar, Main } from "./styles";
+import React, { useEffect, useState } from "react";
+import { useParams } from "react-router-dom";
+import { Container, SideBar, Main, Loading } from "./styles";
 import Profile from "./Profile";
 import Filter from "./Filter";
 import Repositories from "./Repositories";
-import { getLangsFrom } from "../../services/api";
+import { getLangsFrom, getRepos, getUser } from "../../services/api";
 
 function RepositoriesPage() {
+  const { login } = useParams();
+  const [user, setUser] = useState();
+  const [repositories, setRepositories] = useState();
+  const [languages, setLanguages] = useState();
   const [currentLanguage, setcurrentLanguage] = useState();
+  const [isLoading, setIsLoading] = useState(true);
 
-  const user = {
-    login: "Leonardo-Borges-AF",
-    avatar_url: "https://avatars.githubusercontent.com/u/78118687?v=4",
-    followers: 4,
-    following: 4,
-    company: null,
-    blog: "",
-    location: "Bandeirantes - PR",
-    name: "Leonardo Borges Arias Ferreira",
-  };
+  useEffect(() => {
+    const loadData = async () => {
+      const [userResponse, repositoriesResponse] = await Promise.all([
+        getUser(login),
+        getRepos(login),
+      ]);
+      setUser(userResponse.data);
+      setRepositories(repositoriesResponse.data);
+      setLanguages(getLangsFrom(repositoriesResponse.data));
 
-  const repositories = [
-    {
-      id: "1",
-      name: "Repo1",
-      description: "descrição do repo",
-      html_url: "https://github.com/Leonardo-Borges-AF",
-      language: "JavaScript",
-    },
-    {
-      id: "2",
-      name: "Repo2",
-      description: "descrição do repo",
-      html_url: "https://github.com/Leonardo-Borges-AF",
-      language: "JavaScript",
-    },
-    {
-      id: "3",
-      name: "Repo3",
-      description: "descrição do repo",
-      html_url: "https://github.com/Leonardo-Borges-AF",
-      language: "TypeScript",
-    },
-    {
-      id: "4",
-      name: "Repo4",
-      description: "descrição do repo",
-      html_url: "https://github.com/Leonardo-Borges-AF",
-      language: "python",
-    },
-  ];
+      setIsLoading(false);
+    };
+    loadData();
+  }, []);
 
-  const languages = getLangsFrom(repositories);
+  if (isLoading) {
+    return <Loading>Carregando...</Loading>;
+  }
 
   return (
     <Container>
